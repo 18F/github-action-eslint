@@ -1,34 +1,33 @@
-# GitHub ESLint runner
+# eslint action with diff annotations
 
-This action executes ESLint linter on specified javascript files without any previous action/build step or Docker required.
+This action will run eslint on your project, annotating the diff with any
+warnings or errors it encounters. Combined and modified from
+[stefanoeb/eslint-action](https://github.com/stefanoeb/eslint-action) for
+the smart conditional dependency install and 
+[hallee/eslint-action](https://github.com/hallee/eslint-action) to get the nice annotations.
+
+If your build has already run `npm install`, this action won't, but if your
+dependencies haven't yet been installed, then it will. That might speed things
+up for you! Otherwise, it'll run `npm install` or `yarn install`.
 
 ## Prerequisites
 
-### ESLint
-You must have the ESLint running locally for the action to execute. It will use the same rules as you do locally.
-More info [on the ESLint getting started guide](https://eslint.org/docs/user-guide/getting-started#installation-and-usage)
+### esLint
+
+You must have eslint and any configured plugins specified in your
+`package.json` (or Yarn or npm lockfiles). This action will use your project's
+install along with its eslint configuration.
+
+See the [eslint getting started guide](https://eslint.org/docs/user-guide/getting-started#installation-and-usage)
+for more information on getting setup.
 
 ## Usage
 
-### main.yml
+You can add a new job to your existing workflow or create a new one. In any
+case, your GitHub action token is required in order to get annotations. That
+is added with the `repo_token` input.
 
-Add to your existing `main.yml` file or create a new file named `.github/workflows/lint.yml` and copy over one of the examples below to your new workflow file
-
-This is the simplest example to get it running:
-```yml
-name: Lint
-
-on: [push]
-
-jobs:
-  eslint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v1
-      - uses: stefanoeb/eslint-action@1.0.2
-```
-
-By default it will run ESLint through all the files in the project. But you can also specify a glob of files to lint using the `with:` argument on your YAML file. The example below shows ESLint running only on the files under the `src/` folder:
+An example of a simple Yaml file for getting going:
 
 ```yml
 name: Lint
@@ -40,13 +39,41 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
-      - uses: stefanoeb/eslint-action@1.0.2
+      - uses: 18F/github-action-eslint@1.0.0
         with:
-          files: src/
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
 ```
 
-If there is no previous step installing the necessary modules, this action will execute a `yarn install` or `npm install` automatically.
+The `secrets.GITHUB_TOKEN` is provided for you, so there's no need to configure
+that part yourself.
+
+By default, this action will run eslint on all the files in your project. If
+that's not what you want, you can specify a file glob with the `files` input.
+You can also set a path to your project's `package.json` in case it's not in
+the repo root (for example, if you have a monorepo with both frontend and
+backend in the same repo) with the `path` input.
+
+For example:
+
+```yml
+name: Lint
+
+on: [push]
+
+jobs:
+  eslint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: 18F/github-action-eslint@1.0.0
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          files: src/
+          path: web/
+```
 
 ## License
 
-The Dockerfile and associated scripts and documentation in this project are released under the [MIT License](LICENSE).
+This project incorporates code originally released under the MIT License with
+modifications released into the worldwide public domain. See the
+[license information](LICENSE).

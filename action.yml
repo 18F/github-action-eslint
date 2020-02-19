@@ -1,7 +1,14 @@
-name: Run ESLint
-description: Run ESLint on JavaScript files
-author: stefanoeb
+name: Run eslint
+description: Run eslint on JavaScript files
+author: 18F
 inputs:
+  repo-token:
+    description: Token for the GitHub API
+    required: true
+  path:
+    description: Path to be linted
+    required: false
+    default: ''
   files:
     description: Blob of files to lint
     required: false
@@ -10,6 +17,8 @@ runs:
   using: 'docker'
   image: 'Dockerfile'
   args:
+    - ${{ inputs.repo-token }}
+    - ${{ inputs.path }}
     - ${{ inputs.files }}
 branding: 
   icon: circle
