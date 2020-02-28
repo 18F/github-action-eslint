@@ -76,4 +76,4 @@ jobs:
 
 This project incorporates code originally released under the MIT License with
 modifications released into the worldwide public domain. See the
-[license information](LICENSE).
+[license information](LICENSE.md).
